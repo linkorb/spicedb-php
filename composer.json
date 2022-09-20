@@ -1,0 +1,21 @@
+{
+    "name": "linkorb/spicedb-php",
+    "description": "SpiceDB connector for PHP",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Linkorb\\SpiceDB\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "LinkORB"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "grpc/grpc": "^1.42",
+        "google/protobuf": "^3.21"
+    }
+}
