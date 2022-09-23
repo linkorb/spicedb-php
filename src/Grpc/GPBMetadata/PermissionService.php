@@ -15,7 +15,6 @@ class PermissionService
           return;
         }
         \GPBMetadata\Google\Api\Annotations::initOnce();
-        \GPBMetadata\Validate\Validate::initOnce();
         \GPBMetadata\Core::initOnce();
         $pool->internalAddGeneratedFile(hex2bin(
             "0ae6260a187065726d697373696f6e5f736572766963652e70726f746f12" .

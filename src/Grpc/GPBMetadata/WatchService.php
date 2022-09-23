@@ -15,7 +15,6 @@ class WatchService
           return;
         }
         \GPBMetadata\Google\Api\Annotations::initOnce();
-        \GPBMetadata\Validate\Validate::initOnce();
         \GPBMetadata\Core::initOnce();
         $pool->internalAddGeneratedFile(hex2bin(
             "0ae1040a1377617463685f736572766963652e70726f746f120e61757468" .

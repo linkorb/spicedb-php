@@ -15,7 +15,6 @@ class SchemaService
           return;
         }
         \GPBMetadata\Google\Api\Annotations::initOnce();
-        \GPBMetadata\Validate\Validate::initOnce();
         $pool->internalAddGeneratedFile(hex2bin(
             "0aaf040a14736368656d615f736572766963652e70726f746f120e617574" .
             "687a65642e6170692e76311a1c676f6f676c652f6170692f616e6e6f7461" .

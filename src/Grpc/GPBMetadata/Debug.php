@@ -15,7 +15,6 @@ class Debug
           return;
         }
         \GPBMetadata\Core::initOnce();
-        \GPBMetadata\Validate\Validate::initOnce();
         $pool->internalAddGeneratedFile(hex2bin(
             "0ab5070a0b64656275672e70726f746f120e617574687a65642e6170692e" .
             "76311a0a636f72652e70726f746f1a1776616c69646174652f76616c6964" .

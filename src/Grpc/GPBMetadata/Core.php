@@ -14,7 +14,6 @@ class Core
         if (static::$is_initialized == true) {
           return;
         }
-        \GPBMetadata\Validate\Validate::initOnce();
         $pool->internalAddGeneratedFile(hex2bin(
             "0a950c0a0a636f72652e70726f746f120e617574687a65642e6170692e76" .
             "311a1776616c69646174652f76616c69646174652e70726f746f22c3010a" .
