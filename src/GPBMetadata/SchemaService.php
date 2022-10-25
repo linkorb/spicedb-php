@@ -15,6 +15,7 @@ class SchemaService
           return;
         }
         \GPBMetadata\Google\Api\Annotations::initOnce();
+        \GPBMetadata\Validate\Validate::initOnce();
         $pool->internalAddGeneratedFile(
             '
 �
