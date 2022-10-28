@@ -5,10 +5,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Authzed\\": "src/Authzed",
-            "Google\\": "src/Google",
-            "GPBMetadata\\": "src/GPBMetadata",
-            "Grpc\\": "src/Grpc"
+            "LinkORB\\Authzed\\": "src"
         }
     },
     "authors": [
@@ -17,9 +14,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
-        "grpc/grpc": "^1.42",
-        "google/protobuf": "^3.21",
-        "ext-grpc": "*"
+        "php": ">=7.4",
+        "guzzlehttp/guzzle": "^7.5"
     }
 }
