@@ -8,6 +8,7 @@ use LinkORB\Authzed\Dto\Response\Schema as SchemaResponse;
 use LinkORB\Authzed\Exception\SpiceDBServerException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Contracts\HttpClient\ResponseInterface;
 
 class SpiceDB implements ConnectorInterface
 {
@@ -26,8 +27,9 @@ class SpiceDB implements ConnectorInterface
                 'base_uri' => $baseUri,
                 'headers' => [
                     'Accept' => 'application/json',
-                    'Authorization' => $apiKey,
+                    'Authorization' => 'Bearer ' . $apiKey,
                 ],
+                'http_version' => '2.0',
             ]
         );
     }
@@ -42,20 +44,31 @@ class SpiceDB implements ConnectorInterface
             ]
         );
 
+        $this->assertSuccessful($response);
+
+        return $this->serializer->deserialize($response->getContent(), SchemaResponse::class, 'json');
+    }
+
+    public function writeSchema(SchemaRequest $request): void
+    {
+        $data = $this->serializer->serialize($request, 'json');
+        $response = $this->httpClient->request(
+            'POST',
+            '/v1/schema/write',
+            [
+                'body' => $data,
+            ]
+        );
+
+        $this->assertSuccessful($response);
+    }
+
+    private function assertSuccessful(ResponseInterface $response): void
+    {
         if ($response->getStatusCode() >= 400) {
             throw new SpiceDBServerException(
                 $this->serializer->deserialize($response->getContent(), Error::class, 'json')
             );
         }
-
-        /** @var SchemaResponse $data */
-        $data = $this->serializer->deserialize($response->getContent(), SchemaResponse::class, 'json');
-
-        return $data;
-    }
-
-    public function writeSchema(SchemaRequest $request): void
-    {
-        // TODO: Implement writeSchema() method.
     }
 }

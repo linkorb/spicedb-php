@@ -6,9 +6,9 @@ class Schema
 {
     private ?string $schema;
 
-    public function __construct(string $response = null)
+    public function __construct(string $schema = null)
     {
-        $this->schema = $response;
+        $this->schema = $schema;
     }
 
     public function getSchema(): ?string

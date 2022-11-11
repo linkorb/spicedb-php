@@ -5,3 +5,5 @@
 phpunit.xml
 vendor/
 .idea/
+.phpunit.result.cache
+/phpunit.xml

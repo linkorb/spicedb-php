@@ -25,12 +25,12 @@ interface ConnectorInterface
 {
     public function readSchema(): SchemaResponse;
     public function writeSchema(SchemaRequest $request): void;
-    public function checkPermission(PermissionCheckRequest $request): PermissionCheckResponse;
-    public function expandPermission(PermissionExpandRequest $request): PermissionExpandResponse;
-    public function showResourcesPermission(LookupResourceRequest $request): LookupResourceResponse;
-    public function deleteRelationship(RelationshipDeletionRequest $request): RelationshipDeletionResponse;
-    public function readRelationship(RelationshipReadRequest $request): RelationshipReadResponse;
-    public function writeRelationship(RelationshipWriteRequest $request): RelationshipWriteResponse;
-    public function lookupWatch(WatchResourcesRequest $request): WatchResourcesResponse;
-    public function watch(WatchRequest $request): WatchResponse;
+//    public function checkPermission(PermissionCheckRequest $request): PermissionCheckResponse;
+//    public function expandPermission(PermissionExpandRequest $request): PermissionExpandResponse;
+//    public function showResourcesPermission(LookupResourceRequest $request): LookupResourceResponse;
+//    public function deleteRelationship(RelationshipDeletionRequest $request): RelationshipDeletionResponse;
+//    public function readRelationship(RelationshipReadRequest $request): RelationshipReadResponse;
+//    public function writeRelationship(RelationshipWriteRequest $request): RelationshipWriteResponse;
+//    public function lookupWatch(WatchResourcesRequest $request): WatchResourcesResponse;
+//    public function watch(WatchRequest $request): WatchResponse;
 }
