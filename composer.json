@@ -8,6 +8,11 @@
             "LinkORB\\Authzed\\": "src"
         }
     },
+    "autoload-dev": {
+        "psr-4": {
+            "LinkORB\\Authzed\\Tests\\Integration\\": "tests/Integration/"
+        }
+    },
     "authors": [
         {
             "name": "LinkORB"

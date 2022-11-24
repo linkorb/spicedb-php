@@ -2,8 +2,12 @@
 
 namespace LinkORB\Authzed;
 
+use LinkORB\Authzed\Dto\Request\PermissionCheck as PermissionCheckRequest;
+use LinkORB\Authzed\Dto\Request\RelationshipWrite as RelationshipWriteRequest;
 use LinkORB\Authzed\Dto\Request\Schema as SchemaRequest;
 use LinkORB\Authzed\Dto\Response\Error;
+use LinkORB\Authzed\Dto\Response\PermissionCheck as PermissionCheckResponse;
+use LinkORB\Authzed\Dto\Response\RelationshipWrite as RelationshipWriteResponse;
 use LinkORB\Authzed\Dto\Response\Schema as SchemaResponse;
 use LinkORB\Authzed\Exception\SpiceDBServerException;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -51,23 +55,52 @@ class SpiceDB implements ConnectorInterface
 
     public function writeSchema(SchemaRequest $request): void
     {
-        $data = $this->serializer->serialize($request, 'json');
+        $this->assertSuccessful(
+            $this->httpClient->request(
+                'POST',
+                '/v1/schema/write',
+                [
+                    'body' => $this->serializer->serialize($request, 'json'),
+                ]
+            )
+        );
+    }
+
+    public function checkPermission(PermissionCheckRequest $request): PermissionCheckResponse
+    {
         $response = $this->httpClient->request(
             'POST',
-            '/v1/schema/write',
+            '/v1/permissions/check',
             [
-                'body' => $data,
+                'body' => $this->serializer->serialize($request, 'json'),
             ]
         );
 
         $this->assertSuccessful($response);
+
+        return $this->serializer->deserialize($response->getContent(), PermissionCheckResponse::class, 'json');
+    }
+
+    public function writeRelationship(RelationshipWriteRequest $request): RelationshipWriteResponse
+    {
+        $response = $this->httpClient->request(
+            'POST',
+            '/v1/relationships/write',
+            [
+                'body' => $this->serializer->serialize($request, 'json'),
+            ]
+        );
+
+        $this->assertSuccessful($response);
+
+        return $this->serializer->deserialize($response->getContent(), RelationshipWriteResponse::class, 'json');
     }
 
     private function assertSuccessful(ResponseInterface $response): void
     {
         if ($response->getStatusCode() >= 400) {
             throw new SpiceDBServerException(
-                $this->serializer->deserialize($response->getContent(), Error::class, 'json')
+                $this->serializer->deserialize($response->getContent(false), Error::class, 'json')
             );
         }
     }
