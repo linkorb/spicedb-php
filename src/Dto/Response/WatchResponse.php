@@ -11,7 +11,7 @@ class WatchResponse
     private ?array $updates;
     private ?ZedToken $changesThrough;
 
-    public function __construct(array $updates = null, ZedToken $changesThrough = null)
+    public function __construct(array $updates = [], ZedToken $changesThrough = null)
     {
         $this->updates        = $updates;
         $this->changesThrough = $changesThrough;
@@ -30,6 +30,12 @@ class WatchResponse
     public function setUpdates(?array $updates): self
     {
         $this->updates = $updates;
+        return $this;
+    }
+
+    public function addUpdate(RelationshipUpdate $update): self
+    {
+        $this->updates[] = $update;
         return $this;
     }
 

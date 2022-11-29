@@ -7,7 +7,7 @@ class DirectSubjectSet
     /** @var SubjectReference[] */
     private ?array $subjects = [];
 
-    public function __construct(array $subjects = null)
+    public function __construct(array $subjects = [])
     {
         $this->subjects = $subjects;
     }
@@ -20,6 +20,12 @@ class DirectSubjectSet
     public function setSubjects(?array $subjects): self
     {
         $this->subjects = $subjects;
+        return $this;
+    }
+
+    public function addSubject(SubjectReference $subject): self
+    {
+        $this->subjects[] = $subject;
         return $this;
     }
 }

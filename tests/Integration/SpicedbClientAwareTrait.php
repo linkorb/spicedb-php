@@ -4,7 +4,9 @@ namespace LinkORB\Authzed\Tests\Integration;
 
 use LinkORB\Authzed\SpiceDB;
 use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
@@ -13,7 +15,10 @@ trait SpicedbClientAwareTrait
     public function getClient(): SpiceDB
     {
         return new SpiceDB(
-            new Serializer([new ObjectNormalizer()], [new JsonEncoder()]),
+            new Serializer(
+                [new ArrayDenormalizer(), new ObjectNormalizer(null, null, null, new ReflectionExtractor())],
+                [new JsonEncoder()]
+            ),
             HttpClient::create(),
             getenv('SPICEDB_HOST'),
             getenv('SPICEDB_API_KEY')

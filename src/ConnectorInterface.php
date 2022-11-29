@@ -2,6 +2,7 @@
 
 namespace LinkORB\Authzed;
 
+use Generator;
 use LinkORB\Authzed\Dto\Request\LookupResource as LookupResourceRequest;
 use LinkORB\Authzed\Dto\Request\PermissionCheck as PermissionCheckRequest;
 use LinkORB\Authzed\Dto\Request\PermissionExpand as PermissionExpandRequest;
@@ -10,7 +11,6 @@ use LinkORB\Authzed\Dto\Request\RelationshipRead as RelationshipReadRequest;
 use LinkORB\Authzed\Dto\Request\RelationshipWrite as RelationshipWriteRequest;
 use LinkORB\Authzed\Dto\Request\Schema as SchemaRequest;
 use LinkORB\Authzed\Dto\Request\Watch as WatchRequest;
-use LinkORB\Authzed\Dto\Request\WatchResources as WatchResourcesRequest;
 use LinkORB\Authzed\Dto\Response\LookupResource as LookupResourceResponse;
 use LinkORB\Authzed\Dto\Response\PermissionCheck as PermissionCheckResponse;
 use LinkORB\Authzed\Dto\Response\PermissionExpand as PermissionExpandResponse;
@@ -26,11 +26,11 @@ interface ConnectorInterface
     public function readSchema(): SchemaResponse;
     public function writeSchema(SchemaRequest $request): void;
     public function checkPermission(PermissionCheckRequest $request): PermissionCheckResponse;
-//    public function expandPermission(PermissionExpandRequest $request): PermissionExpandResponse;
-//    public function showResourcesPermission(LookupResourceRequest $request): LookupResourceResponse;
-//    public function deleteRelationship(RelationshipDeletionRequest $request): RelationshipDeletionResponse;
-//    public function readRelationship(RelationshipReadRequest $request): RelationshipReadResponse;
+    public function expandPermission(PermissionExpandRequest $request): PermissionExpandResponse;
+    public function showResourcesPermission(LookupResourceRequest $request): LookupResourceResponse;
+    public function deleteRelationship(RelationshipDeletionRequest $request): RelationshipDeletionResponse;
+    public function readRelationship(RelationshipReadRequest $request): RelationshipReadResponse;
     public function writeRelationship(RelationshipWriteRequest $request): RelationshipWriteResponse;
-//    public function lookupWatch(WatchResourcesRequest $request): WatchResourcesResponse;
-//    public function watch(WatchRequest $request): WatchResponse;
+    /** @return Generator|WatchResponse[] */
+    public function watch(WatchRequest $request, float $abortIdleTimeout): Generator;
 }
