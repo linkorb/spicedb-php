@@ -31,12 +31,56 @@ We highly recommend following the **[Protecting Your First App]** guide to learn
 
 ### Installation
 
-To be added...
+Using composer tool run:
+```shell
+composer require linkorb/spicedb-php
+```
 
 ### Initializing a client
 
-To be added...
+SpiceDB connector depends on `symfony/serializer` and `symfony/http-client`. Instantiation of a new client with pure PHP can be done following way:
+```php
+use Symfony\Component\HttpClient\HttpClient;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+
+new SpiceDB(
+    new Serializer(
+        [new ArrayDenormalizer(), new ObjectNormalizer(null, null, null, new ReflectionExtractor())],
+        [new JsonEncoder()]
+    ),
+    HttpClient::create(),
+    getenv('SPICEDB_HOST'),
+    getenv('SPICEDB_API_KEY')
+);
+```
+For Symfony apps there'll be a separate bundle which is currently WIP
 
 ### Performing an API call
 
-To be added...
+SpiceDB connector implements communication through [REST API](https://app.swaggerhub.com/apis-docs/authzed/authzed/1.0#/). Check `LinkORB\Authzed\ConnectorInterface` for available methods. Here's example of write schema request:
+```php
+$client->writeSchema(new \LinkORB\Authzed\Dto\Request\Schema(
+    'definition blog/post {
+           relation reader: blog/user
+           relation writer: blog/user
+           permission read = reader + writer
+           permission write = writer
+    }
+    
+    definition blog/user {}'
+));
+```
+
+### Tests
+Tests can be run with following command:
+```shell
+make run-test
+```
+For that you need to have [Docker](https://www.docker.com/) installed. Alternatively you can run test with PHP installed on host:
+```shell
+phpunit -c ./phpunit.xml --testsuite 'Integration' ./tests/
+```
