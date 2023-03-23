@@ -12,17 +12,21 @@ class PermissionCheck
     private ?ObjectReference $resource;
     private ?string $permission;
     private ?SubjectReference $subject;
+    private ?array $context;
 
     public function __construct(
-        Consistency $consistency = null,
-        ObjectReference $resource = null,
-        string $permission = null,
-        SubjectReference $subject = null
-    ) {
+        Consistency      $consistency = null,
+        ObjectReference  $resource = null,
+        string           $permission = null,
+        SubjectReference $subject = null,
+        array            $context = null
+    )
+    {
         $this->consistency = $consistency;
         $this->resource    = $resource;
         $this->permission  = $permission;
         $this->subject     = $subject;
+        $this->context     = $context;
     }
 
     public function getConsistency(): ?Consistency
@@ -43,6 +47,11 @@ class PermissionCheck
     public function getSubject(): ?SubjectReference
     {
         return $this->subject;
+    }
+
+    public function getContext(): ?array
+    {
+        return $this->context;
     }
 
     public function setConsistency(?Consistency $consistency): self
@@ -66,6 +75,12 @@ class PermissionCheck
     public function setSubject(?SubjectReference $subject): self
     {
         $this->subject = $subject;
+        return $this;
+    }
+
+    public function setContext(?array $context): self
+    {
+        $this->context = $context;
         return $this;
     }
 }

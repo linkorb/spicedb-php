@@ -1,0 +1,10 @@
+definition user {}
+
+caveat my_caveat(first_parameter int, second_parameter string) {
+  first_parameter == 42 && second_parameter == "hello world"
+}
+
+definition resource {
+    relation viewer: user | user with my_caveat
+    permission view = viewer
+}
