@@ -2,7 +2,7 @@
 
 namespace LinkORB\Authzed\Dto;
 
-class Lookup
+class LookupResource
 {
     private ?ZedToken $lookedUpAt;
     private ?string $resourceObjectId;

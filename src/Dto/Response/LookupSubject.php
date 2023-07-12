@@ -2,20 +2,20 @@
 
 namespace LinkORB\Authzed\Dto\Response;
 
-use LinkORB\Authzed\Dto\LookupResource as LookupResourceDto;
+use LinkORB\Authzed\Dto\LookupSubject as LookupSubjectDto;
 
-class LookupResource
+class LookupSubject
 {
-    private ?LookupResourceDto $result;
+    private ?LookupSubjectDto $result;
     private ?Error $error;
 
-    public function __construct(LookupResourceDto $result = null, Error $error = null)
+    public function __construct(LookupSubjectDto $result = null, Error $error = null)
     {
         $this->result = $result;
         $this->error  = $error;
     }
 
-    public function getResult(): ?LookupResourceDto
+    public function getResult(): ?LookupSubjectDto
     {
         return $this->result;
     }
@@ -25,7 +25,7 @@ class LookupResource
         return $this->error;
     }
 
-    public function setResult(?LookupResourceDto $result): self
+    public function setResult(?LookupSubjectDto $result): self
     {
         $this->result = $result;
         return $this;

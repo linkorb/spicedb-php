@@ -11,6 +11,7 @@ use LinkORB\Authzed\Dto\Request\RelationshipWrite as RelationshipWriteRequest;
 use LinkORB\Authzed\Dto\Request\Schema as SchemaRequest;
 use LinkORB\Authzed\Dto\Request\Watch as WatchRequest;
 use LinkORB\Authzed\Dto\SubjectReference;
+use LinkORB\Authzed\Exception\SpiceDBServerException;
 use LinkORB\Authzed\SpiceDB;
 use LinkORB\Authzed\Tests\Integration\SpicedbClientAwareTrait;
 use PHPUnit\Framework\TestCase;
@@ -66,5 +67,23 @@ class WatchTest extends TestCase
             new RelationshipFilter('blog/post')
         );
         $this->client->deleteRelationship($deleteRequest);
+    }
+
+    public function testWatchError(): void
+    {
+        $this->client->writeSchema(new SchemaRequest($this->getSchema()));
+
+        $watchRequest = new WatchRequest(['not-found-error']);
+
+        $this->expectException(SpiceDBServerException::class);
+
+        try {
+            iterator_to_array($this->client->watch($watchRequest, 0.1));
+        } catch (SpiceDBServerException $e) {
+            $this->assertEquals(3, $e->getError()->getCode());
+            $this->assertTrue(false !== strpos($e->getError()->getMessage(), 'value does not match regex pattern'));
+
+            throw $e;
+        }
     }
 }

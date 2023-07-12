@@ -47,24 +47,6 @@ class ErrorTest extends TestCase
         }
     }
 
-    public function testWatchError(): void
-    {
-        $this->client->writeSchema(new SchemaRequest($this->getSchema()));
-
-        $watchRequest = new WatchRequest(['not-found-error']);
-
-        $this->expectException(SpiceDBServerException::class);
-
-        try {
-            iterator_to_array($this->client->watch($watchRequest, 0.1));
-        } catch (SpiceDBServerException $e) {
-            $this->assertEquals(3, $e->getError()->getCode());
-            $this->assertTrue(false !== strpos($e->getError()->getMessage(), 'value does not match regex pattern'));
-
-            throw $e;
-        }
-    }
-
     public function testInvalidSchemaError(): void
     {
         $this->expectException(SpiceDBServerException::class);

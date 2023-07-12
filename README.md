@@ -43,14 +43,16 @@ SpiceDB connector depends on `symfony/serializer` and `symfony/http-client`. Ins
 use Symfony\Component\HttpClient\HttpClient;
 use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use LinkORB\Authzed\Serializer\JsonLinesDecoder;
 use Symfony\Component\Serializer\Normalizer\ArrayDenormalizer;
+use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 
 new SpiceDB(
     new Serializer(
-        [new ArrayDenormalizer(), new ObjectNormalizer(null, null, null, new ReflectionExtractor())],
-        [new JsonEncoder()]
+        [new ArrayDenormalizer(), new UnwrappingDenormalizer(), new ObjectNormalizer(null, null, null, new ReflectionExtractor())],
+        [new JsonEncoder(), new JsonLinesDecoder()]
     ),
     HttpClient::create(),
     getenv('SPICEDB_HOST'),

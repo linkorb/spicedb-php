@@ -9,6 +9,7 @@ use LinkORB\Authzed\Dto\Relationship;
 use LinkORB\Authzed\Dto\RelationshipFilter;
 use LinkORB\Authzed\Dto\RelationshipUpdate;
 use LinkORB\Authzed\Dto\Request\LookupResource as LookupResourceRequest;
+use LinkORB\Authzed\Dto\Request\LookupSubject as LookupSubjectRequest;
 use LinkORB\Authzed\Dto\Request\PermissionCheck as PermissionCheckRequest;
 use LinkORB\Authzed\Dto\Request\PermissionExpand as PermissionExpandRequest;
 use LinkORB\Authzed\Dto\Request\RelationshipDeletion as RelationshipDeletionRequest;
@@ -106,7 +107,7 @@ class PermissionTest extends TestCase
             new RelationshipFilter('blog/post')
         );
         $readResponse = $this->client->readRelationship($readRequest);
-        $this->assertEquals($relationship, $readResponse->getResult()->getRelationship());
+        $this->assertEquals($relationship, $readResponse[0]->getResult()->getRelationship());
 
         $deleteRequest = new RelationshipWriteRequest([
             new RelationshipUpdate(RelationshipUpdate::OPERATION_DELETE, $relationship)
@@ -123,7 +124,7 @@ class PermissionTest extends TestCase
             new RelationshipUpdate(
                 RelationshipUpdate::OPERATION_CREATE,
                 new Relationship(
-                    new ObjectReference('blog/post', 'mypost'),
+                    new ObjectReference('blog/post', 'mypost-to-delete'),
                     'writer',
                     new SubjectReference(new ObjectReference('blog/user', 'john'))
                 )
@@ -133,7 +134,7 @@ class PermissionTest extends TestCase
         $this->assertNotNull($writeResponse->getWrittenAt());
 
         $deleteRequest = new RelationshipDeletionRequest(
-            new RelationshipFilter('blog/post')
+            new RelationshipFilter('blog/post', 'mypost-to-delete'),
         );
         $deleteResponse = $this->client->deleteRelationship($deleteRequest);
         $this->assertNotNull($deleteResponse->getDeletedAt());
@@ -143,8 +144,8 @@ class PermissionTest extends TestCase
             new RelationshipFilter('blog/post')
         );
         $readResponse = $this->client->readRelationship($readRequest);
-        $this->assertNull($readResponse->getResult()->getRelationship());
-        $this->assertNull($readResponse->getError());
+        $this->assertNull($readResponse[0]->getResult()->getRelationship());
+        $this->assertNull($readResponse[0]->getError());
     }
 
     public function testExpandPermission(): void
@@ -156,7 +157,7 @@ class PermissionTest extends TestCase
             new RelationshipUpdate(
                 RelationshipUpdate::OPERATION_CREATE,
                 new Relationship(
-                    new ObjectReference('blog/post', 'mypost'),
+                    new ObjectReference('blog/post', 'mypost-to-expand'),
                     'writer',
                     $subject
                 )
@@ -167,7 +168,7 @@ class PermissionTest extends TestCase
 
         $expandRequest = new PermissionExpandRequest(
             new Consistency(null, $writeResponse->getWrittenAt(), null),
-            new ObjectReference('blog/post', 'mypost'),
+            new ObjectReference('blog/post', 'mypost-to-expand'),
             'writer'
         );
         $expandResponse = $this->client->expandPermission($expandRequest);
@@ -191,7 +192,7 @@ class PermissionTest extends TestCase
             new RelationshipUpdate(
                 RelationshipUpdate::OPERATION_CREATE,
                 new Relationship(
-                    new ObjectReference('blog/post', 'mypost'),
+                    new ObjectReference('blog/post', 'mypost-to-show'),
                     'writer',
                     new SubjectReference(new ObjectReference('blog/user', 'john'))
                 )
@@ -207,8 +208,42 @@ class PermissionTest extends TestCase
             new SubjectReference(new ObjectReference('blog/user', 'john'))
         );
 
-        $showResponse = $this->client->showResourcesPermission($showRequest);
-        $this->assertEquals('mypost', $showResponse->getResult()->getResourceObjectId());
+        $showResponse = $this->client->showResourcesPermission($showRequest)[0];
+        $this->assertEquals('mypost-to-show', $showResponse->getResult()->getResourceObjectId());
+        $this->assertNull($showResponse->getError());
+
+        $deleteRequest = new RelationshipDeletionRequest(
+            new RelationshipFilter('blog/post')
+        );
+        $this->client->deleteRelationship($deleteRequest);
+    }
+    public function testShowSubjects(): void
+    {
+        $this->client->writeSchema(new SchemaRequest($this->getSchema()));
+
+        $writeRequest = new RelationshipWriteRequest([
+            new RelationshipUpdate(
+                RelationshipUpdate::OPERATION_TOUCH,
+                new Relationship(
+                    new ObjectReference('blog/post', 'mypost-to-show-subject'),
+                    'writer',
+                    new SubjectReference(new ObjectReference('blog/user', 'john'))
+                )
+            )
+        ]);
+        $writeResponse = $this->client->writeRelationship($writeRequest);
+        $this->assertNotNull($writeResponse->getWrittenAt());
+
+        $showRequest = new LookupSubjectRequest(
+            new Consistency(null, $writeResponse->getWrittenAt(), null),
+            'blog/user',
+            'write',
+            new ObjectReference('blog/post', 'mypost-to-show-subject')
+        );
+
+        $showResponse = $this->client->showSubjectsPermission($showRequest)[0];
+
+        $this->assertEquals('john', $showResponse->getResult()->getSubjectObjectId());
         $this->assertNull($showResponse->getError());
 
         $deleteRequest = new RelationshipDeletionRequest(

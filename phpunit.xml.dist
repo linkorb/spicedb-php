@@ -23,6 +23,11 @@
         <testsuite name="IntegrationCaveat">
             <file>tests/Integration/PermissionCaveatTest.php</file>
         </testsuite>
+        <testsuite name="IntegrationWithoutCaveatAndWatch">
+            <directory>./tests/Integration</directory>
+            <exclude>tests/Integration/WatchTest.php</exclude>
+            <exclude>tests/Integration/PermissionCaveatTest.php</exclude>
+        </testsuite>
     </testsuites>
 
     <coverage processUncoveredFiles="true">
