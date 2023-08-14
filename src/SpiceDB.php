@@ -4,6 +4,7 @@ namespace LinkORB\Authzed;
 
 use Generator;
 use LinkORB\Authzed\Dto\Request\LookupResource as LookupResourceRequest;
+use LinkORB\Authzed\Dto\Request\LookupSubject as LookupSubjectRequest;
 use LinkORB\Authzed\Dto\Request\PermissionCheck as PermissionCheckRequest;
 use LinkORB\Authzed\Dto\Request\PermissionExpand as PermissionExpandRequest;
 use LinkORB\Authzed\Dto\Request\RelationshipDeletion as RelationshipDeletionRequest;
@@ -13,6 +14,7 @@ use LinkORB\Authzed\Dto\Request\Schema as SchemaRequest;
 use LinkORB\Authzed\Dto\Request\Watch as WatchRequest;
 use LinkORB\Authzed\Dto\Response\Error;
 use LinkORB\Authzed\Dto\Response\LookupResource as LookupResourceResponse;
+use LinkORB\Authzed\Dto\Response\LookupSubject as LookupSubjectResponse;
 use LinkORB\Authzed\Dto\Response\PermissionCheck as PermissionCheckResponse;
 use LinkORB\Authzed\Dto\Response\PermissionExpand as PermissionExpandResponse;
 use LinkORB\Authzed\Dto\Response\RelationshipDeletion as RelationshipDeletionResponse;
@@ -25,6 +27,7 @@ use LinkORB\Authzed\Dto\Response\WatchResponse as WatchResponseResult;
 use LinkORB\Authzed\Exception\SpiceDBServerException;
 use Symfony\Component\HttpClient\Exception\ClientException;
 use Symfony\Component\HttpClient\Exception\TimeoutException;
+use Symfony\Component\Serializer\Normalizer\UnwrappingDenormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
@@ -111,7 +114,7 @@ class SpiceDB implements ConnectorInterface
         return $this->serializer->deserialize($response->getContent(), RelationshipWriteResponse::class, 'json');
     }
 
-    public function readRelationship(RelationshipReadRequest $request): RelationshipReadResponse
+    public function readRelationship(RelationshipReadRequest $request): array
     {
         $response = $this->httpClient->request(
             'POST',
@@ -124,10 +127,10 @@ class SpiceDB implements ConnectorInterface
         $this->assertSuccessful($response);
 
         if ($response->getContent() === '') {
-            return new RelationshipReadResponse(new RelationshipReadResponseResult());
+            return [new RelationshipReadResponse(new RelationshipReadResponseResult())];
         }
 
-        return $this->serializer->deserialize($response->getContent(), RelationshipReadResponse::class, 'json');
+        return $this->serializer->deserialize($response->getContent(), RelationshipReadResponse::class  . '[]', 'jsonl');
     }
 
     public function deleteRelationship(RelationshipDeletionRequest $request): RelationshipDeletionResponse
@@ -160,7 +163,7 @@ class SpiceDB implements ConnectorInterface
         return $this->serializer->deserialize($response->getContent(), PermissionExpandResponse::class, 'json');
     }
 
-    public function showResourcesPermission(LookupResourceRequest $request): LookupResourceResponse
+    public function showResourcesPermission(LookupResourceRequest $request): array
     {
         $response = $this->httpClient->request(
             'POST',
@@ -172,7 +175,22 @@ class SpiceDB implements ConnectorInterface
 
         $this->assertSuccessful($response);
 
-        return $this->serializer->deserialize($response->getContent(), LookupResourceResponse::class, 'json');
+        return $this->serializer->deserialize($response->getContent(), LookupResourceResponse::class . '[]', 'jsonl');
+    }
+
+    public function showSubjectsPermission(LookupSubjectRequest $request): array
+    {
+        $response = $this->httpClient->request(
+            'POST',
+            '/v1/permissions/subjects',
+            [
+                'body' => $this->serializer->serialize($request, 'json'),
+            ]
+        );
+
+        $this->assertSuccessful($response);
+
+        return $this->serializer->deserialize($response->getContent(), LookupSubjectResponse::class . '[]', 'jsonl');
     }
 
     public function watch(WatchRequest $request, float $abortIdleTimeout): Generator
@@ -207,8 +225,10 @@ class SpiceDB implements ConnectorInterface
     private function assertSuccessful(ResponseInterface $response): void
     {
         if ($response->getStatusCode() >= 400) {
+            $errorDecoded = $this->serializer->decode($response->getContent(false), 'json');
+
             throw new SpiceDBServerException(
-                $this->serializer->deserialize($response->getContent(false), Error::class, 'json')
+                $this->serializer->denormalize($errorDecoded, Error::class, 'json', [UnwrappingDenormalizer::UNWRAP_PATH => array_key_exists('error', $errorDecoded) ? '[error]' : ''])
             );
         }
     }
